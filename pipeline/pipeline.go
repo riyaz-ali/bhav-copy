@@ -62,7 +62,7 @@ func downloader(input <-chan Resource) <-chan Parseable {
 
 	go func() {
 		for resource := range input {
-			log.Info().Str("resource", resource.String()).Msg("downloading resource")
+			log.Debug().Str("resource", resource.String()).Msg("downloading resource")
 			if r, err := resource.Fetch(); err != nil {
 				log.Warn().Err(err).Str("resource", resource.String()).Msg("failed to download resource")
 			} else {

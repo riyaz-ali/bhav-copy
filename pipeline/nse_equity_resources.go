@@ -53,7 +53,7 @@ func (b NseEquityResource) Fetch() (_ Parseable, err error) {
 	var fileName = fmt.Sprintf("cm%sbhav.csv", uc(b.date.Format("02Jan2006")))
 	var file fs.File
 	if file, err = zipReader.Open(fileName); err != nil {
-		return nil, errors.Wrapf(err, "failed to open file %q from zip", fileName)
+		return nil, errors.Wrapf(err, "failed to open file %s", fileName)
 	}
 
 	var data []byte

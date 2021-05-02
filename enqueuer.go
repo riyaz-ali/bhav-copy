@@ -37,13 +37,13 @@ func Holiday(d time.Time) bool {
 // EnqueueEquity enqueues job for processing equity data
 func EnqueueEquity(from, to time.Time, wg *sync.WaitGroup, exc string, gen func(on time.Time) pipeline.Resource, in chan<- pipeline.Resource) {
 	defer wg.Done()
-	for d := from; d.Before(to); d = d.Add(day) {
+	for d := from; d.Before(to) || d.Equal(to); d = d.Add(day) {
 		if Holiday(d) {
 			log.Info().Str("exchange", exc).Msgf("skipping job for %s", d.Format("Mon 02 Jan, 2006"))
 			continue
 		}
 
-		log.Info().Str("exchange", exc).Msgf("enqueuing job for %s", d.Format("Mon 02 Jan, 2006"))
+		log.Debug().Str("exchange", exc).Msgf("enqueuing job for %s", d.Format("Mon 02 Jan, 2006"))
 		in <- gen(d)
 	}
 }

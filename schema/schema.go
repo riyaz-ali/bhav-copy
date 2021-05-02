@@ -32,8 +32,7 @@ func Apply(c *sqlite.Conn) (err error) {
 		return sqlitex.Exec(c, fmt.Sprintf("PRAGMA user_version = %d", v), nil)
 	}
 
-
-	log.Info().Msgf("current migration version is v%d", getVersion())
+	log.Debug().Msgf("current migration version is v%d", getVersion())
 	var current int64 = 0 // currently processing migration
 
 	// for each file in the directory, we read+apply it returning error if any
@@ -44,14 +43,14 @@ func Apply(c *sqlite.Conn) (err error) {
 
 		_, _ = fmt.Sscanf(entry.Name(), "v%d.sql", &current)
 		if current <= getVersion() { // skip this migration if its already applied
-			log.Info().Str("file", entry.Name()).Msgf("skipping version v%d", current)
+			log.Debug().Str("file", entry.Name()).Msgf("skipping version v%d", current)
 			return nil
 		}
 
 		var file, _ = migrations.Open(path)
 		var buf, _ = ioutil.ReadAll(file)
 
-		log.Info().Str("file", entry.Name()).Msgf("applying script version v%d", current)
+		log.Debug().Str("file", entry.Name()).Msgf("applying script version v%d", current)
 		if e := sqlitex.ExecScript(c, string(buf)); e != nil {
 			return errors.Wrapf(e, "failed to apply migration(%s)", entry.Name())
 		}
