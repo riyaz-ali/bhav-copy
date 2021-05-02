@@ -107,9 +107,9 @@ type BseEquity struct {
 
 func (_ *BseEquity) Exchange() string       { return "bse" }
 func (b *BseEquity) TradingDate() time.Time { return b.Date }
-func (b *BseEquity) Ticker() string         { return b.Code }
+func (b *BseEquity) Ticker() string         { return defaultsTo(bseLookup(b.Code).SecurityId, b.Code) }
 func (b *BseEquity) Type() string           { return b.ScripType }
-func (b *BseEquity) ISIN() string           { return b.Isin }
+func (b *BseEquity) ISIN() string           { return defaultsTo(b.Isin, bseLookup(b.Code).ISIN) }
 func (b *BseEquity) Last() float64          { return b.LastValue }
 func (b *BseEquity) PrevClose() float64     { return b.PrevCloseValue }
 func (b *BseEquity) OHLC() (open, high, low, close float64) {

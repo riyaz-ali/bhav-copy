@@ -18,3 +18,10 @@ func (b *csvDate) UnmarshalCSV(data []byte) error {
 		return nil
 	}
 }
+
+func defaultsTo(v string, def string) string {
+	if strings.TrimSpace(v) == "" {
+		return def
+	}
+	return v
+}
