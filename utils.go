@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
+// date implements pflag.Value to parse timestamp from command-line
+type date time.Time
+
+func (d *date) String() string     { return time.Time(*d).Format("02-Jan-2006") }
+func (d *date) Type() string       { return "timestamp" }
+func (d *date) Set(s string) error { tt, err := time.Parse("02-Jan-2006", s); *d = date(tt); return err }
+
 // returns last sync date from database
 func minDatabaseDate(c *sqlite.Conn) (bse, nse time.Time) {
 	var stmt = c.Prep(lastTradingDate)
