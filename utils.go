@@ -19,21 +19,17 @@ func minDatabaseDate(c *sqlite.Conn) (bse, nse time.Time) {
 	var stmt = c.Prep(lastTradingDate)
 	defer stmt.Finalize()
 
-	for {
+	for exchange, ts := range map[string]*time.Time{"bse": &bse, "nse": &nse} {
+		stmt.SetText(":exchange", exchange)
 		if r, err := stmt.Step(); err != nil {
 			log.Fatal().Err(err).Msg("failed to fetch sync information from database")
 		} else if !r {
-			break
+			// possible that we don't find any data for the given exchange ..
+			// because maybe we are syncing for the first time for the given exchange
+			continue
 		}
 
-		switch ex := stmt.GetText("exchange"); ex {
-		case "bse":
-			bse, _ = time.Parse("2006-01-02", stmt.GetText("last_trading_date"))
-		case "nse":
-			nse, _ = time.Parse("2006-01-02", stmt.GetText("last_trading_date"))
-		default:
-			log.Fatal().Msgf("unknown exchange: %s", ex)
-		}
+		*ts, _ = time.Parse("2006-01-02", stmt.GetText("last_trading_date"))
 	}
 	return bse, nse
 }
@@ -48,4 +44,3 @@ func closest(to time.Time, values ...time.Time) time.Time {
 	}
 	return to.Add(-c)
 }
-
