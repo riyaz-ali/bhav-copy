@@ -26,10 +26,11 @@ func minDatabaseDate(c *sqlite.Conn) (bse, nse time.Time) {
 		} else if !r {
 			// possible that we don't find any data for the given exchange ..
 			// because maybe we are syncing for the first time for the given exchange
+			_ = stmt.Reset()
 			continue
 		}
-
 		*ts, _ = time.Parse("2006-01-02", stmt.GetText("last_trading_date"))
+		_ = stmt.Reset()
 	}
 	return bse, nse
 }
